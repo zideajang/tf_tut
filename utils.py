@@ -26,8 +26,8 @@ class CifarData:
                     all_labels.append(label)
         self._data = np.vstack(all_data)
         self._labels = np.hstack(all_labels)
-        print self._data.shape
-        print self._labels.shape
+        # print self._data.shape
+        # print self._labels.shape
         self._num_examples = self._data.shape[0]
         self._need_shuffle = need_shuffle
         self._indicator = 0
@@ -59,7 +59,10 @@ class CifarData:
 train_filenames = [os.path.join(CIFAR_DIR,'data_batch_%d' % i) for i in range(1,6)]
 test_filenames = [os.path.join(CIFAR_DIR,'test_batch')]
 
-train_data = CifarData(train_filenames,True)
+
+# batch_data, batch_labels = train_data.next_batch(10)
+# print batch_data
+# print batch_labels
 # (10000, 3072)
 # (10000,)
 

@@ -54,10 +54,20 @@ correct_prediction = tf.equal(tf.cast(predict,tf.int64),y_reshaped)
 # [1,0,0,1,1,]
 accuracy = tf.reduce_mean(tf.cast(correct_prediction,tf.float64))
 
+train_data = CifarData(train_filenames,True)
+test_data = CifarData(test_filenames,False)
+batch_size = 20
+train_steps = 100000
+
 with tf.name_scope('train_op'):
     # learning rate le-3 
-    train_op = tf.train.AdamOptimizer(le-3).minimize(loss)
+    train_op = tf.train.AdamOptimizer(1e-3).minimize(loss)
 init = tf.global_variables_initializer()
+
 with tf.Session() as sess:
-    sess.run([loss,accuracy,train_op],feed_dict={x:,y: })
-    
+    sess.run(init)
+    for i in range(train_steps):
+        batch_data,batch_labels = train_data.next_batch(batch_size)
+        loss_val, accu_val,_ = sess.run([loss,accuracy,train_op],feed_dict={x: batch_data,y: batch_labels})
+        if (i+1) % 500 == 0:
+            print '[Train] Step: %d, loss: %4.5f, acc: %4.5f' % (i, loss_val, accu_val)
