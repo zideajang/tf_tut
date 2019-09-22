@@ -26,17 +26,20 @@ x_image = tf.reshape(x,[-1,3,32,32])
 x_image = tf.transpose(x_image,perm=[0,2,3,1])
 
 # neru feature_map image output
-conv1 = tf.layers.conv2d(x_image,32,(3,3),padding='same',activation=tf.nn.relu,name='conv1')
+conv1_1 = tf.layers.conv2d(x_image,32,(3,3),padding='same',activation=tf.nn.relu,name='conv1_1')
+conv1_2 = tf.layers.conv2d(conv1_1,32,(3,3),padding='same',activation=tf.nn.relu,name='conv1_2')
 # 16 * 16
-pooling1 = tf.layers.max_pooling2d(conv1,(2,2),(2,2),name='pool1')
+pooling1 = tf.layers.max_pooling2d(conv1_2,(2,2),(2,2),name='pool1')
 
-conv2 = tf.layers.conv2d(pooling1,32,(3,3),padding='same',activation=tf.nn.relu,name='conv2')
+conv2_1 = tf.layers.conv2d(pooling1,32,(3,3),padding='same',activation=tf.nn.relu,name='conv2_1')
+conv2_2 = tf.layers.conv2d(conv2_1,32,(3,3),padding='same',activation=tf.nn.relu,name='conv2_2')
 # 8 * 8
-pooling2 = tf.layers.max_pooling2d(conv2,(2,2),(2,2),name='pool2')
+pooling2 = tf.layers.max_pooling2d(conv2_2,(2,2),(2,2),name='pool2')
 
-conv3 = tf.layers.conv2d(pooling2,32,(3,3),padding='same',activation=tf.nn.relu,name='conv3')
+conv3_1 = tf.layers.conv2d(pooling2,32,(3,3),padding='same',activation=tf.nn.relu,name='conv3_1')
+conv3_2 = tf.layers.conv2d(conv3_1,32,(3,3),padding='same',activation=tf.nn.relu,name='conv3_2')
 # 4 * 4
-pooling3 = tf.layers.max_pooling2d(conv3,(2,2),(2,2),name='pool3')
+pooling3 = tf.layers.max_pooling2d(conv3_2,(2,2),(2,2),name='pool3')
 
 # [None , 4 * 4 * 32]
 flatten = tf.layers.flatten(pooling3)
