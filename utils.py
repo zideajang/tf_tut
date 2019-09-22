@@ -20,12 +20,9 @@ class CifarData:
         all_labels = []
         for filename in filenames:
             data,labels = load_data(filename)
-            for item,label in zip(data,labels):
-                if label in [0,1]:
-                    all_data.append(item)
-                    all_labels.append(label)
+            all_data.append(data)
+            all_labels.append(labels)
         self._data = np.vstack(all_data)
-        # 
         self._data = self._data/127.5 - 1
         self._labels = np.hstack(all_labels)
         # print self._data.shape
