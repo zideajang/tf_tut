@@ -17,56 +17,21 @@ test_filenames = [os.path.join(CIFAR_DIR, 'test_batch')]
 train_data = CifarData(train_filenames, True)
 test_data = CifarData(test_filenames, False)
 
-# ['data_batch_1', 'readme.html', 'batches.meta', 'data_batch_2', 'data_batch_5', 'test_batch', 'data_batch_4', 'data_batch_3']
-
-# [None]
-# define input and output placeholder recieved input 
 # None present confirm count of smaples
 x = tf.placeholder(tf.float32,[None,3072])
 y = tf.placeholder(tf.int64,[None])
-# (3071,10)
-w = tf.get_variable('w',[x.get_shape()[-1],10],initializer=tf.random_normal_initializer(0,1))
-# (10,)
-b = tf.get_variable('b',[10],initializer=tf.constant_initializer(0.0))
 
-# [None,3072] * [3072,10] = [None,10]
-# only y_ f(x) = x * W + b [None,1]
-y_ = tf.matmul(x,w) + b
+hidden1 = tf.layers.dense(x,100,activation=tf.nn.relu)
+hidden2 = tf.layers.dense(hidden1,100,activation=tf.nn.relu)
+hidden3 = tf.layers.dense(hidden2,50,activation=tf.nn.relu)
 """
-# [None,1]
-# change f(x) output in (0,1) range
-p_y_1 = tf.nn.sigmoid(y_)
-# p_y_1 = tf.nn.sigmoid(y_)
-
-# [None,1]
-y_reshaped = tf.reshape(y,(-1,1))
-y_reshaped_float = tf.cast(y_reshaped,tf.float32)
-
-# avg(y_prep**2 - y_expect**2) loss = L(f(x) - y)
-# cal loss
-loss = tf.reduce_mean(tf.square(y_reshaped_float - p_y_1))
-
+[Train] Step: 9999, loss: 1.24794, acc: 0.45000
+[Test ] Step: 10000, acc: 0.50300
 """
+# simplify with tensorflow api
+y_ = tf.layers.dense(hidden3,10)
 
-#mean square loss
-"""
-# 1 + e^x
-# e^x / sum(e^x)
-# [[0.01,0.02...0.09],[],...]
-p_y = tf.nn.softmax(y_)
-# 5 -> [0,0,0,0,1,..,0]
-y_one_hot = tf.one_hot(y,10,dtype=tf.float32)
-loss = tf.reduce_mean(tf.square(y_one_hot - p_y))
-"""
-# y_ softmax
-# y one_hot
-# loss =  ylogy
 loss = tf.losses.sparse_softmax_cross_entropy(labels=y,logits=y_)
-
-
-# bool 
-# predict return bool value so need bool type as int64
-# predict = p_y_1 > 0.5
 
 # indices
 predict = tf.argmax(y_,1)
