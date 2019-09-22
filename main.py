@@ -60,3 +60,4 @@ with tf.name_scope('train_op'):
 init = tf.global_variables_initializer()
 with tf.Session() as sess:
     sess.run([loss,accuracy,train_op],feed_dict={x:,y: })
+    

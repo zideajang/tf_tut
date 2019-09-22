@@ -14,10 +14,54 @@ def load_data(filename):
     with open(filename,'rb') as f:
         data = cPickle.load(f)
         return data['data'],data['labels']
-# with open(os.path.join(CIFAR_DIR,"data_batch_1"),'rb') as f:
-#     data = pickle.load(f)
-# image_arr = data['data'][100]
-# image_arr = image_arr.reshape((3,32,32))
-# image_arr = image_arr.transpose((1,2,0))
-# plt.imshow(image_arr)
-# plt.show()
+class CifarData:
+    def __init__(self,filenames,need_shuffle):
+        all_data = []
+        all_labels = []
+        for filename in filenames:
+            data,labels = load_data(filename)
+            for item,label in zip(data,labels):
+                if label in [0,1]:
+                    all_data.append(item)
+                    all_labels.append(label)
+        self._data = np.vstack(all_data)
+        self._labels = np.hstack(all_labels)
+        print self._data.shape
+        print self._labels.shape
+        self._num_examples = self._data.shape[0]
+        self._need_shuffle = need_shuffle
+        self._indicator = 0
+        if self._need_shuffle:
+            self._shuffle_data()
+    
+    def _shuffle_data(self):
+        p = np.random.permutation(self._num_examples)
+        self._data = self._data[p]
+        self._labels = self._labels[p]
+    
+    def next_batch(self,batch_size):
+        """ return batch_size examples as a batch. """
+        end_indicator = self._indicator + batch_size
+        if end_indicator > self._num_examples:
+            if self._need_shuffle:
+                self._shuffle_data()
+                self._indicator = 0
+                end_indicator = batch_size
+            else:
+                raise Exception("have no more examples")
+        if end_indicator > self._num_examples:
+            raise Exception("batch size is larager than all examples")
+        batch_data = self._data[self._indicator:end_indicator]
+        batch_labels = self._labels[self._indicator:end_indicator]
+        self._indicator = end_indicator
+        return batch_data, batch_labels
+
+train_filenames = [os.path.join(CIFAR_DIR,'data_batch_%d' % i) for i in range(1,6)]
+test_filenames = [os.path.join(CIFAR_DIR,'test_batch')]
+
+train_data = CifarData(train_filenames,True)
+# (10000, 3072)
+# (10000,)
+
+# test_data = CifarData(train_filenames,True)
+
