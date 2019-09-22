@@ -25,6 +25,8 @@ class CifarData:
                     all_data.append(item)
                     all_labels.append(label)
         self._data = np.vstack(all_data)
+        # 
+        self._data = self._data/127.5 - 1
         self._labels = np.hstack(all_labels)
         # print self._data.shape
         # print self._labels.shape
