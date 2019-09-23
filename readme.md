@@ -1,3 +1,5 @@
+深度神经网有今天的发展不得不要归功于斯坦福华人教授李飞飞的 ImageNet，有了强大数据集其中包含 1400 万张图，22000 种分类，其中多达 100 万张图片中物体是有边框。AlexNet 是 2012 分类冠军 top5 出错率为 16.4%
+在 AlexNet 中有一些突破
 ### 梯度消失
 softmax = tf.exp(logits) / tf.reduce_
 可以去文档 API 可以去官方的文档去查
@@ -102,3 +104,75 @@ NASNet 强化学习和卷积神经网络
 ```
 [Train] Step: 499, loss: 1.41713, acc: 0.35000
 ```
+
+### MobileNet
+```
+[Train] Step: 499, loss: 1.57021, acc: 0.45000
+[Train] Step: 499, loss: 1.57021, acc: 0.45000
+[Train] Step: 999, loss: 1.37653, acc: 0.50000
+[Test ] Step: 1000, acc: 0.46700
+[Train] Step: 1499, loss: 1.37062, acc: 0.50000
+[Train] Step: 1999, loss: 1.22970, acc: 0.65000
+[Test ] Step: 2000, acc: 0.51400
+[Train] Step: 2499, loss: 1.42647, acc: 0.5500
+```
+
+2012 AlexNet
+2014 VGGNet
+2015 ResNet
+InceptionV1-V4
+MobileNet 深度可分离卷积
+
+### 卷积神经网络调参
+#### 更多优化算法
+##### 随机梯度下降
+    - 局部极值
+    - Saddle point 问题
+##### 动量梯度下降
+##### 现存问题
+    - 受到初始学习率影响很大
+    - 每一个维度的学习率一样(全局设置学习率）
+    - 很难学习到稀疏数据，多数情况是得不到梯度更新
+##### 解决方案
+###### AdaGrad 算法
+调整学习率
+$$ n_t = nt_t + g_t^2 $$
+$$ \Delta\theta_t = - \frac{\eta}{\sqrt{n_t + \epsilon}}  $$
+```python
+grad_squared = 0
+with True:
+    dx = compute_gradient(x)
+    grad_squared += dx * dx
+    x -= learning_rate * dx / (np.sqrt(grad_squared) + 1e-7)
+
+```
+####### 算法特点
+- 前期 regularizer 较小，放大梯度
+- 后期 regularizer 较大，缩小梯度
+- 梯度随训练次数降低
+- 每个分量有不同的学习率
+####### 缺点
+- 学习率设置过大，导致 regularizer 影响过于敏感
+- 后期，regularizer 累积值太大，体现
+
+##### RMSProp
+- Adagrad 的变种
+- 由累积平方梯度变为平均平方梯度
+- 解决了后期提前结束的问题
+```python
+grad_squared += decay_rate * grade_squared + (1 - decay_rate) * dx * dx
+```
+##### 自定义学习率
+- 可以自定义随指数衰减的学习率
+$$ \alpha = \alpha_0e^{-kt} $$
+    - k 是系数
+    - t 迭代次数
+$$  $$
+- 对于稀疏数据（），使用学习率可（高纬度小数据
+- SGD
+### 激活函数
+
+- 网络初始化
+- 归一化
+- 数据增强
+- 更多调参方法
