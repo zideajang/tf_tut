@@ -144,7 +144,7 @@ Loss 和 参数更新的关系反应learning rate，在做线性回归时候我�
 $$ \eta $$
 #### Adagrad
 $$ w^{t+1} \leftarrow w^t - \eta^t g^t $$
-$$  $$
+$$ $$
 ### 反向传播(Backpropagation)
 $$ w_a^+ = w_1 + \eta \frac{\partial E_{total}}{\partial w_1}$$
 
