@@ -8,11 +8,148 @@
 特别感谢李宏毅教程，可能内容一些资料和图来自于李宏毅老师的机器学习。也喜欢大家有时间多看一看李宏毅老师的课程，每一观看都会有新的收获。
 #### 学习机器学习
 #### 课程设计
+整个内容都是伴随自己学习过程沉底下来，学习前自己状态是高数自从毕业后除了像考验看了一阵大概有十多年没有碰高数，
 #### 为什么学习机器学习
 - 机器学习有一定难度
 - 机器学习是需求
 - 
 ### 回归问题
+线性回归可以应用在股票预测，房价预测，无人车驾驶、还就就是推荐系统，淘宝或者京东，用户A购买商品 B 可能性也是。李宏毅老师是以预测宝可梦进化为例来讲的线性回归，所谓线性回归就是可以暂时理解根据以往经验（数据）总结出规律来预测未来。 
+
+#### 抛出问题
+$$ f(x) = 2 \cdot x + 0.5 $$
+我们先估计第一个特征方程
+然后在估计一个两个特征的特征
+$$ f(x_1,x_2) = 2 x_1 + 3 x_2 + 5$$
+今天我们是通过学习来找到这么方程然后，用方程来预测一些值，那么我们如何通过学习来找到这个**函数**呢。这也就是今天我们今天主要要学习的。
+
+#### 1.定义模型
+什么是模型，所谓模型我们认为是一组函数的集合，
+$$ y = wx + b $$
+这里我们定义函数 
+$$ f(x) = w \cdot x + b $$
+在这个函数的参数 w 和 b 可能是任意数值，
+
+
+$$
+    f_1 = 0.1x + 2 
+$$
+$$
+    f_2  = 0.8x + 1
+$$
+$$
+    f_3  = 0.75x - 2
+$$
+
+这是一个线性模型，
+$$
+    y = \sum x_iw_i
+$$
+
+### 线性回归实例
+
+
+#### 准备数据
+$$ (x^1,\hat{y}^1) (x^2,\hat{y}^2) \cdots (x^i,\hat{y}^i)$$
+
+```python
+import tensorflow as tf
+import numpy as np
+import matplotlib.pyplot as plt
+
+learning_rate = 0.01
+epochs = 200
+
+n_samples = 30
+train_x = np.linspace(0,20,n_samples)
+train_y = 3 * train_x + 4* np.random.rand(n_samples)
+
+plt.plot(train_x,train_y,'o')
+plt.show()
+```
+
+```python
+plt.plot(train_x,train_y,'o')
+plt.plot(train_x, 3 * train_x)
+plt.show()
+```
+
+#### 创建变量
+
+```python
+X = tf.placeholder(tf.float32)
+Y = tf.placeholder(tf.float32)
+
+W = tf.Variable(np.random.randn,name='weights')
+B = tf.Variable(np.random.randn,name='bias')
+```
+
+#### 定义计算图
+$$ pred = X * W + B $$
+
+#### 定义损失函数
+然后定义评估函数也就是我们提到损失函数
+$$ \frac{1}{2n} \sum_{i}^n(pred(i) -Y_i)^2  $$
+
+```python
+cost = tf.reduce_sum((pred - Y) ** 2) / (2 * n_samples)
+
+```
+
+#### 优化
+```
+optimizer = tf.train.GradientDescentOptimizer(learning_rate).minimize(cost)
+
+
+```
+
+#### 训练
+
+```python
+init = tf.global_variables_initializer()
+with tf.Session() as sess:
+    sess.run(init)
+    for epoch in range(epochs):
+        for x, y in zip(train_x,train_y):
+            sess.run(optimizer,feed_dict={X:x,Y:y})
+        if not epoch % 20:
+            c = sess.run(cost,feed_dict={X:train_x,Y:train_y})
+            w = sess.run(W)
+            b = sess.run(B)
+            print(f'epoch:{epoch:04d} c={c:.4f} w={w:.4f} b={b:.4f}')
+```
+
+#### 验证结果
+```
+    weight = sess.run(W)
+    bias = sess.run(B)
+    plt.plot(train_x,train_y,'o')
+    plt.plot(train_x,weight * train_x + bias)
+    plt.show()
+```
+
+```
+epoch:0000 c=78.2851 w=1.8528 b=1.4544
+epoch:0020 c=7.5476 w=2.8999 b=1.4118
+epoch:0040 c=7.4682 w=2.9079 b=1.2879
+epoch:0060 c=7.3967 w=2.9155 b=1.1703
+epoch:0080 c=7.3324 w=2.9226 b=1.0587
+epoch:0100 c=7.2745 w=2.9295 b=0.9528
+epoch:0120 c=7.2224 w=2.9359 b=0.8522
+epoch:0140 c=7.1755 w=2.9421 b=0.7568
+epoch:0160 c=7.1334 w=2.9479 b=0.6662
+epoch:0180 c=7.0954 w=2.9535 b=0.5802
+```
+
+
+#### 评估
+评估我们函数好坏，这里定义一个损失函数（用L表示)，损失函数是接受我们一个模型一个函数作为参数，那么学过函数编程都知道这就是所谓高阶函数，我们f(x) 是 L的参数。这个函数输出就是通过数值表示这个函数有多好，和多不好。
+
+$$ L(f(x))= L(b,w)$$
+因为我们这里 f(x) 是 b 和 w 决定的，所以我们就可以用 L(b,w)
+
+$$ L(f) = \sum_{i=1}^n(\hat{y}^n = (b + w \cdot x^n ))^2 $$
+
 ### 分类问题
 ### 逻辑线性回归
 ### 深度神经网络
