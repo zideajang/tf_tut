@@ -26,7 +26,7 @@ with tf.Session() as sess:
 # print(y_train[:4])
 
 learning_rate = 0.01
-epochs = 50
+epochs = 10
 batch_size = 100
 batches = int(x_train.shape[0] / batch_size)
 
@@ -43,11 +43,29 @@ pred = tf.nn.softmax(tf.add(tf.matmul(X,W),B))
 
 # Loss
 cost = tf.reduce_mean(-tf.reduce_sum(Y* tf.log(pred),axis=1))
-# 
+# optimizer
+optimizer = tf.train.GradientDescentOptimizer(learning_rate).minimize(cost)
 
+with tf.Session() as sess:
+    sess.run(tf.global_variables_initializer())
+    for epoch in range(epochs):
+        for i in range(batches):
+            offset = i * epoch
+            x = x_train[offset:offset + batch_size]
+            y = y_train[offset:offset + batch_size]
+            sess.run(optimizer,feed_dict={X:x,Y:y})
+            c = sess.run(cost,feed_dict={X:x,Y:y})
+
+        if not epoch % 1:
+            print(f'epoch:{epoch} cost={c:.4f}')
+    correct_pred = tf.equal(tf.argmax(pred,1),tf.argmax(Y,1))
+    accuracy = tf.reduce_mean(tf.cast(correct_pred,tf.float32))
+    acc = accuracy.eval({X:x_test,Y:y_test})
+    print(acc)
 # x = np.linspace(1/100,1,100)
 # plt.plot(x,np.log(x))
 # plt.show()
+
 
 
 # pred
@@ -70,9 +88,9 @@ print(r_mean)
 2.322996090254173
 """
 
-with tf.Session() as sess:
-    tf_sum = sess.run(-tf.reduce_mean(a * b,axis=1))
-    tf_mean = sess.run(tf.reduce_mean(tf_sum))
+# with tf.Session() as sess:
+#     tf_sum = sess.run(-tf.reduce_mean(a * b,axis=1))
+#     tf_mean = sess.run(tf.reduce_mean(tf_sum))
 
-print(f'sum = {tf_sume}')
-print(f'mean = {tf_mean}')
+# print(f'sum = {tf_sume}')
+# print(f'mean = {tf_mean}')

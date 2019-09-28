@@ -14,22 +14,22 @@
 - 机器学习是需求
 - 
 ## 回归问题
-线性回归可以应用在股票预测，房价预测，无人车驾驶、还就就是推荐系统，淘宝或者京东，用户A购买商品 B 可能性也是。李宏毅老师是以预测宝可梦进化为例来讲的线性回归，所谓线性回归就是可以暂时理解根据以往经验（数据）总结出规律来预测未来。 
+线性回归可以应用在股票预测，房价预测，无人车驾驶、还就就是推荐系统，淘宝或者京东，用户A购买商品 B 可能性也是。李宏毅老师是以预测宝可梦进化为例来讲的线性回归，所谓线性回归就是可以暂时理解根据以往经验（数据）总结出规律来预测未来。
+再简化一些问题，其实
 
 ### 抛出问题
 $$ f(x) = 3 \cdot x $$
-我们先估计第一个特征方程
-然后在估计一个两个特征的特征
+今天我们要解决一个问题就是通过训练集数据来找到一个函数（上面函数），其实这个应该对于我们在简单不过了，学多人在小学时候就会通过带入数据来找到 x 权重 3。正式因为这是简单问题，我们自然就会解决而忽略解决问题过程。今天的神经网络也就是模拟我们人类是如何学习的。
+当然我们也会遇到相对更复杂问题，
 $$ f(x_1,x_2) = 2 x_1 + 3 x_2 + 5$$
 今天我们是通过学习来找到这么方程然后，用方程来预测一些值，那么我们如何通过学习来找到这个**函数**呢。这也就是今天我们今天主要要学习的。
 
 ### 1.定义模型
 什么是模型，所谓模型我们认为是一组函数的集合，
 $$ y = wx + b $$
-这里我们定义函数 
+这里我们定义函数模型，因为是一组函数组成模型，当然这些函数未知数和次元是我们设计的，所以我们定义模型函数如下，通过不同 w 和 b 来得到一组函数。
 $$ f(x) = w \cdot x + b $$
-在这个函数的参数 w 和 b 可能是任意数值，
-
+在这个函数的参数 w 和 b 可能是任意数值，随意理论上我们函数数量是无穷。不过为了简化问题我们也会将 w 和 b 限定在一定范围来减少运算。
 
 $$
     f_1 = 2x + 2 
@@ -60,16 +60,30 @@ $$ L(f) = \sum_{i=1}^n(\hat{y}^n = (b + w \cdot x^n ))^2 $$
 
 - $\hat{y}^n$ 是真实值，我们现在函数计算出值与真实值做差后平方，来计算每一个样本的差值，然后在取平方后求和。
 
-### 最优解
-$$ f^* = arg \min_{w,b} L(w,b) 
-$$
+其实我们要弄清两个问题
+- 第一个问题是优化谁：我们需要不但更新权重 w 和偏差值 b 来找最优函数
+- 第二个问题是怎么优化：通过缩小预期值和真实值的误差来优化。
+
+### 优化
+
+$$ f^* = arg \min_{w,b} L(w,b) $$
 $$ w^*,b^* = 
 arg \min_{w,b} \sum_{n=1}^10 ( \hat{y}^n - (b + w \cdot x_i^n) )^2 $$ 
+这就是一个如何找到最优解的方程，我们知道求解这个方程就可以得到我们想要最优函数，也就是我们想要的 w 和 b。我们可以根据大学学过知识来解这个问题。
 
-### 梯度下降（大名鼎鼎）
+#### 梯度下降（大名鼎鼎）
 梯度下降是用于处理一切可微分的方程，我们需要在曲线上找到最低点，也就是导数为 0 位置，不过导数为 0 位置不一定是最低点，随后案例我们就会遇到这种情况。
-
+- 随机找到一位置
 $$  \frac{dL}{dx} | _{w=w^0} $$
+
+我们在曲线随意找一点作为起始点，然后在这点进行求导得到关于曲线这一点的切线。
+
+$$ w^1 \leftarrow w^0 - \eta\frac{dL}{dw} | _{w=w^0}$$
+$$ w^2 \leftarrow w^1 - \eta\frac{dL}{dw} | _{w=w^1}$$
+当切线为负，我们就增加 w 值像右移动 $\eta$ 是学习速度，也就是移动步长。知道走到微分为 0 时候我们停止前进，所以我们就会思考梯度下降不一定会知道最小值。
+
+上面考虑是一个参数情况，接下来我们来考虑 2 参数
+$$ \frac{\partial L}{\partial w} | _{w=w^0,b=b^0},\frac{\partial L}{\partial b} | _{w=w^0,b=b^0} $$
 
 ### 线性回归实例
 
@@ -269,13 +283,94 @@ B = tf.Variable(np.random.randn(10).astype(np.float32))
 pred = tf.nn.softmax(tf.add(tf.matmul(X,W),B))
 
 # Loss
-cost = tf.reduce_mean(-tf.reduce_sum(Y* tf.log(pred),axis=1))
+cost = tf.reduce_mean(-tf.reduce_sum(Y * tf.log(pred),axis=1))
 # 
 ```
+$$ C = \sum -Y\ln(pred)$$
+我们看一看损失函数，
+
+```python
+x = np.linspace(1/100,1,100)
+plt.plot(x,np.log(x))
+plt.show()
+```
+我们来以图形的形式输出一下 log 函数
 ![图](https://upload-images.jianshu.io/upload_images/8207483-00842e7cff045013.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 
-$$ C = \sum -Y\ln(pred)$$
+在我们通过曲线看出$\ln(x)$ 在1.0之后趋近于 0 
 
+```
+a = np.log([[0.04,0.13,0.96,0.12], #correct
+        [0.01,0.93,0.06,0.07]]) #incrroet
+# labels
+b = np.array([[0,0,1,0],
+        [1,0,0,0]]) 
+```
+
+```
+[[0.         0.         0.04082199 0.        ]
+ [4.60517019 0.         0.         0.        ]]
+```
+
+```
+with tf.Session() as sess:
+    tf_sum = sess.run(-tf.reduce_mean(a * b,axis=1))
+    tf_mean = sess.run(tf.reduce_mean(tf_sum))
+```
+
+```
+with tf.Session() as sess:
+    sess.run(tf.global_variables_initializer())
+    for epoch in range(epochs):
+        for i in range(batches):
+            offset = i * epoch
+            x = x_train[offset:offset + batch_size]
+            y = y_train[offset:offset + batch_size]
+            sess.run(optimizer,feed_dict={X:x,Y:y})
+            c = sess.run(cost,feed_dict={X:x,Y:y})
+
+        if not epoch % 1:
+            print(f'epoch:{epoch} cost={c:.4f}')
+```
+
+```
+epoch:47 cost=0.6200
+epoch:48 cost=0.4541
+epoch:49 cost=0.7006
+```
+
+```
+with tf.Session() as sess:
+    sess.run(tf.global_variables_initializer())
+    for epoch in range(epochs):
+        for i in range(batches):
+            offset = i * epoch
+            x = x_train[offset:offset + batch_size]
+            y = y_train[offset:offset + batch_size]
+            sess.run(optimizer,feed_dict={X:x,Y:y})
+            c = sess.run(cost,feed_dict={X:x,Y:y})
+
+        if not epoch % 1:
+            print(f'epoch:{epoch} cost={c:.4f}')
+    correct_pred = tf.equal(tf.argmax(pred,1),tf.argmax(Y,1))
+    accuracy = tf.reduce_mean(tf.cast(correct_pred,tf.float32))
+    acc = accuracy.eval({X:x_test,Y:y_test})
+    print(acc)
+    ```
+
+```
+epoch:0 cost=3.2238
+epoch:1 cost=5.1471
+epoch:2 cost=3.1629
+epoch:3 cost=1.9107
+epoch:4 cost=2.1143
+epoch:5 cost=2.3709
+epoch:6 cost=1.7046
+epoch:7 cost=1.2634
+epoch:8 cost=2.3583
+epoch:9 cost=1.2030
+0.7397
+```
 
 ### 深度神经网络
 ### 反向传播
