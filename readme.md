@@ -2,7 +2,20 @@
 #### 节名称
 ##### 小节名称
 
+### 特别感谢
+感谢李宏毅教授的课程，部分图片和资料参考李宏毅教授的课程
 
+### 目标
+我们一起从机器学习小白成长为可以用机器学习做一些项目，从而得到高薪职位改善一些一下生活。
+- 分类
+- 影像/语音识别
+- 聊天机器人
+### 准备
+需要了解一些线性代数和高等数学知识，学过就行这样应该捡起来不难，不用系统学习，现用现学吧。不会涉及到特别高深难懂知识，所以有点心理准备。
+### 
+
+### 分享特点
+可能大家学习了学多机器学习课程，想要问你的分享有啥特点，就像我们在国美买手机，总会掏出手机查一下京东对应价格。我的特点就是我真真切切地从一个机器学习门外汉和我一起跨进到机器学习行业内。内容并不会避讳一些难点，虽然有些数学知识，也会给出详尽解释，如果你是一个专业人士估计对比不会有用。内容会不断随着自己学习更新和完善
 
 ### 前言
 特别感谢李宏毅教程，可能内容一些资料和图来自于李宏毅老师的机器学习。也喜欢大家有时间多看一看李宏毅老师的课程，每一观看都会有新的收获。
@@ -77,20 +90,49 @@ arg \min_{w,b} \sum_{n=1}^10 ( \hat{y}^n - (b + w \cdot x_i^n) )^2 $$
 $$  \frac{dL}{dx} | _{w=w^0} $$
 
 我们在曲线随意找一点作为起始点，然后在这点进行求导得到关于曲线这一点的切线。
-
+![一个参数梯度下降](https://upload-images.jianshu.io/upload_images/8207483-91594f2419522cf6.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 $$ w^1 \leftarrow w^0 - \eta\frac{dL}{dw} | _{w=w^0}$$
 $$ w^2 \leftarrow w^1 - \eta\frac{dL}{dw} | _{w=w^1}$$
 当切线为负，我们就增加 w 值像右移动 $\eta$ 是学习速度，也就是移动步长。知道走到微分为 0 时候我们停止前进，所以我们就会思考梯度下降不一定会知道最小值。
 
 上面考虑是一个参数情况，接下来我们来考虑 2 参数
 $$ \frac{\partial L}{\partial w} | _{w=w^0,b=b^0},\frac{\partial L}{\partial b} | _{w=w^0,b=b^0} $$
+![两个参数梯度下降](https://upload-images.jianshu.io/upload_images/8207483-0145f3d48e89c8ec.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+
+$$ w^1 \leftarrow w^0 - \eta\frac{dL}{dw} | _{w=w^0,b=b^0}$$
+$$ w^2 \leftarrow w^0 - \eta\frac{dL}{dw} | _{w=w^0,b=b^0}$$
+
+$$ b^1 \leftarrow b^0 - \eta\frac{dL}{dw} | _{w=w^1,b=b^1}$$
+$$ b^2 \leftarrow b^1 - \eta\frac{dL}{dw} | _{w=w^1,b=b^1}$$
+
+$$
+\Delta
+$$
+这个线就是等高线的法线方向，然后更新参数，每一次根据偏微分来移动点来获取下一次参数 w 和 b
+
+$$ \theta^* = \arg \max_{\theta} L(\theta)$$
+ 
+ $$ L(\theta^0) > L(\theta^1) > L(\theta^2) > \cdotss$$
+
+ #### 问题点
+ ![梯度下降停止点](https://upload-images.jianshu.io/upload_images/8207483-1b39abe32aa653d5.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+
+$$
+    L(w,b) = \sum_{n=1}^{10}( \hat{y}^n - (b + w \cdot x_i^n))^2
+
+$$
+
+$$
+\frac{\delta L}{\delta w} = \sum_{n=1}^{10}2( \hat{y}^n - (b + w \cdot x_i^n))(-x_i^i)
+$$
+
+
+$$
+\frac{\delta L}{\delta b} = \sum_{n=1}^{10}2( \hat{y}^n - (b + w \cdot x_i^n))(-1)
+$$
 
 ### 线性回归实例
-
-
 #### 准备数据
-
-
 ```python
 import tensorflow as tf
 import numpy as np
@@ -134,14 +176,13 @@ $$ \frac{1}{2n} \sum_{i}^n(pred(i) -Y_i)^2  $$
 cost = tf.reduce_sum((pred - Y) ** 2) / (2 * n_samples)
 
 ```
+用计算出估计值(pred) 减去实际值，也就是估计值到真实值的距离然后平方来去掉负数后取均值。
 
 #### 优化
 ```
 optimizer = tf.train.GradientDescentOptimizer(learning_rate).minimize(cost)
-
-
 ```
-
+我们优化就是需要让损失函数最小，所以最小化 cost 函数的参数就是最好的参数
 #### 训练
 
 ```python
@@ -157,6 +198,7 @@ with tf.Session() as sess:
             b = sess.run(B)
             print(f'epoch:{epoch:04d} c={c:.4f} w={w:.4f} b={b:.4f}')
 ```
+设计好我们计算图后，就可以开始进行计算了，我们所有计算图都需要放到 
 
 #### 验证结果
 ```
@@ -179,13 +221,133 @@ epoch:0140 c=7.1755 w=2.9421 b=0.7568
 epoch:0160 c=7.1334 w=2.9479 b=0.6662
 epoch:0180 c=7.0954 w=2.9535 b=0.5802
 ```
-
-
-
+## 误差的来源
 
 ## 分类问题
+包括二分类问题还是多分类问题，我们今天手写数字或文字来进行识别分类，我们人脸检测也属于分类问题。
+
+$$ f(c) = $$
+我们需要将物体属性进行数字化，我们可以向量来描述一个物体，然后根据特性来对物体进行区分来达到分类。
+### 应用范围
+
+### 条件概率和全概率
+![小球问题](https://upload-images.jianshu.io/upload_images/8207483-8f50d6d51b5848b8.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+
+我们整理一下已知条件,已知条件如下，相比大家看公式就一目了然
+
+$$ P(B_1) = \frac{2}{3} P(Blue | B_1) = \frac{4}{5} P(Green|B_1) = \frac{1}{5}$$
+$$ P(B_1) = \frac{1}{3} P(Blue | B_1) = \frac{2}{5} P(Green|B_1) = \frac{3}{5}$$
+
+根据已知条件，我们就可以计算出今天我们取出一个篮球是从 B1 盒子取出的概率
+$$ P(B_1 | Blue) = \frac{P(Blue|B_1)P(B_1)}{P(Blue|B_1)P(B_1) + P(Blue|B_2 )P(B_2)}$$
+
+这里根分类是什么关系，暂时还不是那么好理解，我们停下来思考一下，其实分类问题，我们推出物体属于哪一个类别也就是一种概率问题，大家不能否认推出是概率问题，那么我们取出物体可能类别也就转化为概率问题。每一个盒子想象类，取小球动作转化为推出小球是输出哪一个盒子问题
+
+$$ P(C_1 | x) = \frac{P(x | C_1)P(C_1)} {P(x|C_1)P(C_1) + P(x|C_2)P(C_2)} $$
+
+#### 全概率事件
+我们得到 $P(C_1|x)$ 就需要，$P(x) = P(x|C_1)P(C_1) + P(x|C_2)P(C_2)$
+
+#### Prior
+
+
+### 线性回归模型 VS
+
+### 解决方案
+#### 
+
+### 图片分类实例
+其实有时候做多了也就有感觉，我们通过大量练习返回来思考总结才是自己的
+#### 数据集以及数据处理
+
+- 获取数据集
+```
+fashion_mnist = keras.datasets.fashion_mnist
+```
+- 训练数据集和测试数据集
+```
+(train_images,train_labels),(test_images,test_labels) = fashion_mnist.load_data()
+
+```
+- 查看数据集结构
+
+```
+print(train_images[0].shape)
+print(train_labels[0])
+```
+
+```
+(28, 28)
+9
+```
+```
+class_names = ['T恤','裤子','套衫','上衣','外套','凉鞋','衬衫','运动鞋','包','短靴']
+```
+- 视图查看图片
+
+```
+plt.figure()
+plt.imshow(train_images[0])
+plt.colorbar()
+plt.grid(False)
+plt.show()
+```
+![短靴](https://upload-images.jianshu.io/upload_images/8207483-0cb1ace193812cd2.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+
+```
+plt.figure(figsize=(10,10))
+for i in range(25):
+    plt.subplot(5,5,i+1)
+    plt.xticks([])
+    plt.yticks([])
+    plt.grid(False)
+    plt.imshow(train_images[i],cmap=plt.cm.binary)
+    plt.xlabel(u"\"" + class_names[train_labels[i]] + "\"")
+plt.show()
+```
+![服装分类](https://upload-images.jianshu.io/upload_images/8207483-13aedf9584c7f20f.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+
+
+
+### 网络结构设计
+
+
+
 ## 逻辑线性回归
 
+
+
+### 二分类实例
+```
+imdb = keras.datasets.imdb
+
+(train_data,train_labels),(test_data,test_labels) = imdb.load_data(num_words=10000)
+
+```
+
+```
+word_index = imdb.get_word_index()
+# key add padding incidate start and indicate unknown and indicate unused
+word_index = {k:(v+3) for k,v in word_index.items()}
+# consist even 
+word_index["<PAD>"] = 0
+word_index["<START>"] = 1
+word_index["<UNK>"] = 2
+word_index["<UNUSED>"] = 3
+
+reverse_word_index = dict([(value,key) for (key,value) in word_index.items()])
+
+def decode_review(text):
+    return ' '.join([reverse_word_index.get(i,"?") for i in text])
+
+print(train_data[0])
+print(decode_review(train_data[0]))
+``` 
+
+```
+[1, 14, 22, 16, 43, 530, 973, 1622, 1385, 65, 458, 4468, 66, 3941, 4, 173, 36, 256, 5, 25, 100, 43, 838, 112, 50, 670, 2, 9, 35, 480, 284, 5, 150, 4, 172, 112, 167, 2, 336, 385, 39, 4, 172, 4536, 1111, 17, 546, 38, 13, 447, 4, 192, 50, 16, 6, 147, 2025, 19, 14, 22, 4, 1920, 4613, 469, 4, 22, 71, 87, 12, 16, 43, 530, 38, 76, 15, 13, 1247, 4, 22, 17, 515, 17, 12, 16, 626, 18, 2, 5, 62, 386, 12, 8, 316, 8, 106, 5, 4, 2223, 5244, 16, 480, 66, 3785, 33, 4, 130, 12, 16, 38, 619, 5, 25, 124, 51, 36, 135, 48, 25, 1415, 33, 6, 22, 12, 215, 28, 77, 52, 5, 14, 407, 16, 82, 2, 8, 4, 107, 117, 5952, 15, 256, 4, 2, 7, 3766, 5, 723, 36, 71, 43, 530, 476, 26, 400, 317, 46, 7, 4, 2, 1029, 13, 104, 88, 4, 381, 15, 297, 98, 32, 2071, 56, 26, 141, 6, 194, 7486, 18, 4, 226, 22, 21, 134, 476, 26, 480, 5, 144, 30, 5535, 18, 51, 36, 28, 224, 92, 25, 104, 4, 226, 65, 16, 38, 1334, 88, 12, 16, 283, 5, 16, 4472, 113, 103, 32, 15, 16, 5345, 19, 178, 32]
+<START> this film was just brilliant casting location scenery story direction everyone's really suited the part they played and you could just imagine being there robert <UNK> is an amazing actor and now the same being director <UNK> father came from the same scottish island as myself so i loved the fact there was a real connection with this film the witty remarks throughout the film were great it was just brilliant so much that i bought the film as soon as it was released for <UNK> and would recommend it to everyone to watch and the fly fishing was amazing really cried at the end it was so sad and you know what they say if you cry at a film it must have been good and this definitely was also <UNK> to the two little boy's that played the <UNK> of norman and paul they were just brilliant children are often left out of the <UNK> list i think because the stars that play them all grown up are such a big profile for the whole film but these children are amazing and should be praised for what they have done don't you think the whole story was so lovely because it was true and was someone's life after all that was shared with us all
+```
 
 ### 逻辑回归实例
 #### 数据
