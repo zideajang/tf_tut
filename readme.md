@@ -3,16 +3,41 @@
 ##### 小节名称
 
 ### 特别感谢
-感谢李宏毅教授的课程，部分图片和资料参考李宏毅教授的课程
+感谢李宏毅教授的课程，部分图片和资料参考李宏毅教授的课程,也参照许多相关书籍。
+感谢 sentdex 的分享
 
 ### 目标
-我们一起从机器学习小白成长为可以用机器学习做一些项目，从而得到高薪职位改善一些一下生活。
-- 分类
+我们一起从机器学习小白成长为可以用机器学习做一些项目，从而得到高薪职位改善一些一下生活。深度神经网发展今天有许多框架供我们选择使用例如 TensorFlow mxnet 和 keras ，有了这些框架我们就可以轻松地搭建出模型，也就是设计出神经网络。我们就像玩乐高一样随意选择和组合搭建出神经网络，通过来调试各种参数，调整隐藏层顺序和组合来得到较高精准率，当然学习好基础知识和了解其实现的背后原理是必要，这样我们才可以轻松调整参数来得的预期的模型。
+- 物体识别
 - 影像/语音识别
 - 聊天机器人
+- 其实翻译
 ### 准备
 需要了解一些线性代数和高等数学知识，学过就行这样应该捡起来不难，不用系统学习，现用现学吧。不会涉及到特别高深难懂知识，所以有点心理准备。
-### 
+### 主流框架
+- TensorFlow
+- MXNet
+- Keras
+在分享中实例主要是以上 3 三种来演示，不过大家知道除此之外当下流行框架还很多，例如Caffe、Torch 等。
+
+### 生物神经网络
+
+### 激活函数
+$$ tanh(x) = \frac{e^{2x} - 1}{e^{2x} + 1}$$
+通过图形我们会发现根据输入值很快输出 1 或者 -1 ，靠近 0 部分非常接近线性而在值比较大时候会有上下线控制。
+$$ relu(x) = max(0,x) $$
+这是是 tanh 简化版，计算器会比较快，在图像识别中推荐使用 relu 
+$$ softmax(x)_i = \frac{e^{x_i}}{\sum e^{x_i}} $$
+softmax 主要用来做一些分类问题，所有分类问题在最后一层输出都可以用 softmax
+
+### 反向转播
+这是一个比较难于理解的部分，不过如果你不理解似乎也不会影响你使用机器学习，不过只有很好理解什么是反向传播才能够真正理解在模型中是如何优化参数的。
+
+参考一个老外课程来理解什么是**反向传播**，每一个函数可以看做管道阀来控制流量。
+
+$$
+    = \frac{\delta fr}{1}
+$$
 
 ### 分享特点
 可能大家学习了学多机器学习课程，想要问你的分享有啥特点，就像我们在国美买手机，总会掏出手机查一下京东对应价格。我的特点就是我真真切切地从一个机器学习门外汉和我一起跨进到机器学习行业内。内容并不会避讳一些难点，虽然有些数学知识，也会给出详尽解释，如果你是一个专业人士估计对比不会有用。内容会不断随着自己学习更新和完善
@@ -64,7 +89,10 @@ $$ (x^1,\hat{y}^1) (x^2,\hat{y}^2) \cdots (x^i,\hat{y}^i)$$
 我们需要使用上标表示一个类，用下标表示该类的某个属性。
 
 ### 评估
+
 评估我们函数好坏，这里定义一个损失函数（用L表示)，损失函数是接受我们一个模型一个函数作为参数，那么学过函数编程都知道这就是所谓高阶函数，我们f(x) 是 L的参数。这个函数输出就是通过数值表示这个函数有多好，和多不好。
+
+所以引入损失函数(Loss Function) 也有人使用 Cost Function ,损失函数也会根据具体情况而不同
 
 $$ L(f(x))= L(b,w)$$
 因为我们这里 f(x) 是 b 和 w 决定的，所以我们就可以用 L(b,w)
@@ -132,6 +160,8 @@ $$
 $$
 
 ### 线性回归实例
+来一个线性回归问题实例，在开始之前我们先明确一些问题，也就是我们要训练模型几个步骤，在李宏毅教授的课程中他提到会分为建立模型（也就是函数集合），然后就是定义损失函数，最后根据损失函数进行优化找到最优的函数。
+不过我们对于简单的神经网，个人总结了一点经验，首先是准备好训练和测试数据集，然后处理这些数据以便训练，然后就是定义输入变量，因为都是矩阵和向量乘法，在设计神经网网络时候我们需要考虑结构以及矩阵的维度和矩阵元素类型，这样运算可以顺利进行。然后就是定义损失函数，接下来是定义优化找到让损失函数最小的那个方程也就是我们最优解，然后用最优解方程来测试我们测试数据，来评估我们模型精确度。
 #### 准备数据
 ```python
 import tensorflow as tf
@@ -230,6 +260,11 @@ $$ f(c) = $$
 我们需要将物体属性进行数字化，我们可以向量来描述一个物体，然后根据特性来对物体进行区分来达到分类。
 ### 应用范围
 
+有关分类问题，我们假设一下，有 $C_1$ 和 $C_2 两个类别分类数量为 65 和 78 那么就是
+$$ P(C_1) = 65/(78 + 65) =  0.45 $$
+$$ P(C_2) = 78/(78 + 65) =  0.55 $$
+下面问题就感觉有点绕，我尝试将其说明，假如我们拿到物体 a 那么这个物体类 $C_1$ 的概率是多少
+
 ### 条件概率和全概率
 ![小球问题](https://upload-images.jianshu.io/upload_images/8207483-8f50d6d51b5848b8.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 
@@ -307,12 +342,63 @@ plt.show()
 ```
 ![服装分类](https://upload-images.jianshu.io/upload_images/8207483-13aedf9584c7f20f.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 
-
-
 ### 网络结构设计
+- 定义输入变量
+- 设计层
+第一层，将 28 * 28 像素矩阵转换为 784 向量作为输入
+```
+keras.layers.Flatten(input_shape=(28,28)),
+```
+第二层，
+```
+keras.layers.Dense(128,activation=tf.nn.relu),
+```
+输出
+```
+keras.layers.Dense(10,activation=tf.nn.softmax)
 
+```
+- 评估
+- 优化
 
+```
+model.compile(optimizer="adam",loss="sparse_categorical_crossentropy",metrics=["accuracy"])
 
+```
+```
+Epoch 1/5
+60000/60000 [==============================] - 3s 57us/sample - loss: 0.4979 - acc: 0.8242
+Epoch 2/5
+60000/60000 [==============================] - 3s 53us/sample - loss: 0.3738 - acc: 0.8658
+Epoch 3/5
+60000/60000 [==============================] - 3s 52us/sample - loss: 0.3356 - acc: 0.8784
+Epoch 4/5
+60000/60000 [==============================] - 3s 53us/sample - loss: 0.3112 - acc: 0.8855
+Epoch 5/5
+60000/60000 [==============================] - 3s 53us/sample - loss: 0.2928 - acc: 0.8929
+```
+#### 测试
+```
+print(f"Test Accuracy:{test_acc}")
+```
+```
+# Test Accuracy:0.8672999739646912
+```
+
+```
+predictions = model.predict(test_images)
+print(predictions[0])
+print(np.argmax(predictions[0]))
+print(test_labels[0])
+```
+
+```
+cc: 0.8773
+[1.2115221e-06 2.8071650e-08 2.4146255e-08 8.1381808e-09 2.2384482e-07
+ 3.9193379e-03 4.5686298e-07 3.4515742e-02 2.3175874e-06 9.6156067e-01]
+9
+9
+```
 ## 逻辑线性回归
 
 
@@ -817,3 +903,127 @@ $$ \sigma(x) = \frac{1}{1+e^{-1}} $$
 - 归一化
 - 数据增强
 - 更多调参方法
+
+
+## SVM
+### 再次回到二分类问题
+$$
+g(x) =
+\begin{cases}
+f(x) > 0 output =+1 \\
+f(x) < 0 output =-1
+\end{cases}
+$$
+在看一看我们训练数据集样子
+$$
+x^1 \hat{y}^1
+$$
+
+## Keras
+### 卷积神经网络
+#### 数据集
+下载 window 的 Cat 和 Dog 数据集作为训练数据集
+我们可以先列出对于数据处理几个步骤
+- 下载数据集
+- 拆分为训练数据集和测试数据集
+- 分析（查看）数据
+- 处理数据来达到适合训练的数据结构
+    - 包括灰度处理
+    - 对图片缩放
+    - 整理标签为 one-hot 格式数据等等
+
+```
+DATADIR = "PetImages"
+CATEGORIES = ['Dog','Cat']
+
+for category in CATEGORIES:
+    print(category)
+    path = os.path.join(DATADIR,category)
+    for img in os.listdir(path):
+        img_array = cv2.imread(os.path.join(path,img),cv2.IMREAD_GRAYSCALE)
+        plt.imshow(img_array,cmap="gray")
+        plt.show()
+        break
+    break
+```
+![狗](https://upload-images.jianshu.io/upload_images/8207483-02007a6a3603a8c0.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+```
+IMG_SIZE = 50
+print(img_array.shape)
+new_array = cv2.resize(img_array,(IMG_SIZE,IMG_SIZE))
+plt.imshow(new_array,cmap='gray')
+plt.show()
+```
+![50_50_狗)](https://upload-images.jianshu.io/upload_images/8207483-1cfa2b75e78c04f3.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+
+```
+
+DATADIR = "PetImages"
+CATEGORIES = ['Dog','Cat']
+IMG_SIZE = 50
+training_data = []
+def create_training_data():
+    for category in CATEGORIES:
+        # print(category)
+        path = os.path.join(DATADIR,category) # path to cats or dogs dir
+        # print(path)
+        class_num = CATEGORIES.index(category)
+        for img in os.listdir(path):
+            try:
+                img_array = cv2.imread(os.path.join(path,img),cv2.IMREAD_GRAYSCALE)
+                new_array = cv2.resize(img_array,(IMG_SIZE,IMG_SIZE))
+                training_data.append([new_array,class_num])
+            except Exception as e:
+                pass
+```
+
+```
+24946
+```
+通过获取数据我们先读取 Dog 然后读取 Cat 这样就找出机器在读取数据时候先读取（看到）都是 Dog 数据，这样只要仔细一想就知道不适合机器学习。
+```
+random.shuffle(training_data)
+```
+```
+for sample in training_data[:10]:
+    print(sample[1])
+```
+```
+1
+1
+1
+0
+1
+1
+0
+1
+0
+1
+```
+```
+X = np.array(X).reshape(-1,IMG_SIZE,IMG_SIZE,1)
+```
+每一次
+
+
+```
+pickle_out = open("X.pickle","wb")
+pickle.dump(X, pickle_out)
+pickle_out.close()
+
+pickle_out = open("y.pickle","wb")
+pickle.dump(y, pickle_out)
+pickle_out.close()
+
+pickle_in = open("X.pickle","rb")
+X = pickle.load(pickle_in)
+print(X[1])
+```
+```
+Epoch 1/3
+22451/22451 [==============================] - 77s 3ms/sample - loss: 0.6500 - acc: 0.6149 - val_loss: 0.6271 - val_acc: 0.6397
+Epoch 2/3
+22451/22451 [==============================] - 76s 3ms/sample - loss: 0.5349 - acc: 0.7360 - val_loss: 0.5465 - val_acc: 0.7255
+Epoch 3/3
+22451/22451 [==============================] - 75s 3ms/sample - loss: 0.4796 - acc: 0.7738 - val_loss: 0.4885 - val_acc: 0.7671
+```
