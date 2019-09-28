@@ -13,17 +13,17 @@
 - 机器学习有一定难度
 - 机器学习是需求
 - 
-### 回归问题
+## 回归问题
 线性回归可以应用在股票预测，房价预测，无人车驾驶、还就就是推荐系统，淘宝或者京东，用户A购买商品 B 可能性也是。李宏毅老师是以预测宝可梦进化为例来讲的线性回归，所谓线性回归就是可以暂时理解根据以往经验（数据）总结出规律来预测未来。 
 
-#### 抛出问题
-$$ f(x) = 2 \cdot x + 0.5 $$
+### 抛出问题
+$$ f(x) = 3 \cdot x $$
 我们先估计第一个特征方程
 然后在估计一个两个特征的特征
 $$ f(x_1,x_2) = 2 x_1 + 3 x_2 + 5$$
 今天我们是通过学习来找到这么方程然后，用方程来预测一些值，那么我们如何通过学习来找到这个**函数**呢。这也就是今天我们今天主要要学习的。
 
-#### 1.定义模型
+### 1.定义模型
 什么是模型，所谓模型我们认为是一组函数的集合，
 $$ y = wx + b $$
 这里我们定义函数 
@@ -32,25 +32,50 @@ $$ f(x) = w \cdot x + b $$
 
 
 $$
-    f_1 = 0.1x + 2 
+    f_1 = 2x + 2 
 $$
 $$
-    f_2  = 0.8x + 1
+    f_2  = 8.8x + 1
 $$
 $$
     f_3  = 0.75x - 2
 $$
 
-这是一个线性模型，
+这是一个线性模型，我们需要进行初步筛选，为什么说这是线性函数，这是因为函数可以写出这种形式
 $$
     y = \sum x_iw_i
 $$
+所以就是线性函数。这里 w 叫做权重 b 偏移值。
+
+$$ (x^1,\hat{y}^1) (x^2,\hat{y}^2) \cdots (x^i,\hat{y}^i)$$
+我们需要使用上标表示一个类，用下标表示该类的某个属性。
+
+### 评估
+评估我们函数好坏，这里定义一个损失函数（用L表示)，损失函数是接受我们一个模型一个函数作为参数，那么学过函数编程都知道这就是所谓高阶函数，我们f(x) 是 L的参数。这个函数输出就是通过数值表示这个函数有多好，和多不好。
+
+$$ L(f(x))= L(b,w)$$
+因为我们这里 f(x) 是 b 和 w 决定的，所以我们就可以用 L(b,w)
+
+$$ L(f) = \sum_{i=1}^n(\hat{y}^n = (b + w \cdot x^n ))^2 $$
+
+- $\hat{y}^n$ 是真实值，我们现在函数计算出值与真实值做差后平方，来计算每一个样本的差值，然后在取平方后求和。
+
+### 最优解
+$$ f^* = arg \min_{w,b} L(w,b) 
+$$
+$$ w^*,b^* = 
+arg \min_{w,b} \sum_{n=1}^10 ( \hat{y}^n - (b + w \cdot x_i^n) )^2 $$ 
+
+### 梯度下降（大名鼎鼎）
+梯度下降是用于处理一切可微分的方程，我们需要在曲线上找到最低点，也就是导数为 0 位置，不过导数为 0 位置不一定是最低点，随后案例我们就会遇到这种情况。
+
+$$  \frac{dL}{dx} | _{w=w^0} $$
 
 ### 线性回归实例
 
 
 #### 准备数据
-$$ (x^1,\hat{y}^1) (x^2,\hat{y}^2) \cdots (x^i,\hat{y}^i)$$
+
 
 ```python
 import tensorflow as tf
@@ -142,16 +167,116 @@ epoch:0180 c=7.0954 w=2.9535 b=0.5802
 ```
 
 
-#### 评估
-评估我们函数好坏，这里定义一个损失函数（用L表示)，损失函数是接受我们一个模型一个函数作为参数，那么学过函数编程都知道这就是所谓高阶函数，我们f(x) 是 L的参数。这个函数输出就是通过数值表示这个函数有多好，和多不好。
 
-$$ L(f(x))= L(b,w)$$
-因为我们这里 f(x) 是 b 和 w 决定的，所以我们就可以用 L(b,w)
 
-$$ L(f) = \sum_{i=1}^n(\hat{y}^n = (b + w \cdot x^n ))^2 $$
+## 分类问题
+## 逻辑线性回归
 
-### 分类问题
-### 逻辑线性回归
+
+### 逻辑回归实例
+#### 数据
+```
+(x_train,y_train),(x_test,y_test) = tf.keras.datasets.mnist.load_data()
+
+fig,axes = plt.subplots(1,4,figsize=(7,3))
+for img, label, ax in zip(x_train[:4],y_train[:4],axes):
+    ax.set_title(label)
+    ax.imshow(img)
+    ax.axis('off')
+plt.show()
+```
+#### 数据结构
+手写数字的库 mnist 已经被用烂了，不过我们还是用这个演示逻辑回归，因为搜集数据的确是一件难事，要不也不会产生专门提供数据用于机器学习训练公司，而且样本价格不菲。
+```
+print(f'train images: {x_train.shape}')
+print(f'train labels: {y_train.shape}')
+print(f'test images: {x_test.shape}')
+print(f'test labels: {x_test.shape}')
+```
+
+```
+train images: (60000, 28, 28)
+train labels: (60000,)
+test images: (10000, 28, 28)
+test labels: (10000, 28, 28)
+```
+
+#### 数据处理
+
+```
+x_train = x_train.reshape(60000,784) / 255
+x_test = x_test.reshape(10000,784) / 255
+
+```
+
+```
+with tf.Session() as sess:
+    y_train = sess.run(tf.one_hot(y_train,10))
+    y_test = sess.run(tf.one_hot(y_test,10))
+
+print(y_train[:4])
+```
+
+```
+[[0. 0. 0. 0. 0. 1. 0. 0. 0. 0.]
+ [1. 0. 0. 0. 0. 0. 0. 0. 0. 0.]
+ [0. 0. 0. 0. 1. 0. 0. 0. 0. 0.]
+ [0. 1. 0. 0. 0. 0. 0. 0. 0. 0.]]
+
+```
+定义参数
+```
+learning_rate = 0.01
+epochs = 50
+batch_size = 100
+batches = int(x_train.shape[0] / batch_size)
+
+```
+
+$\mathbf{Y} = \sigma(\mathbf{X}\cdot\mathbf{W} + \mathbf{B})$
+
+$
+\begin{pmatrix}
+    y_1 \\ y_2 \\ \vdots \\ y_{10}
+\end{pmatrix}=\sigma\left[
+\begin{pmatrix}
+    x_1 & x_2 & \cdots & x_{784}
+\end{pmatrix}
+\begin{pmatrix}
+    w_{1,1} & w_{1,2} & \cdots & w_{1,10} \\
+    w_{2,1} & w_{2,2} & \cdots & w_{2,10} \\
+    \vdots & \vdots & \ddots & \vdots \\
+    w_{784,1} & w_{784,2} & \cdots & w_{784,10} \\
+\end{pmatrix}
++
+\begin{pmatrix}
+    b_1 \\ b_2 \\ \vdots \\ b_{10}
+\end{pmatrix}
+\right]
+$
+#### 定义参数
+
+```
+X = tf.placeholder(tf.float32,[None,784])
+Y = tf.placeholder(tf.float32,[None,10])
+
+W = tf.Variable(np.random.randn(784,10).astype(np.float32))
+B = tf.Variable(np.random.randn(10).astype(np.float32))
+```
+
+```
+# prediction
+pred = tf.nn.softmax(tf.add(tf.matmul(X,W),B))
+
+# Loss
+cost = tf.reduce_mean(-tf.reduce_sum(Y* tf.log(pred),axis=1))
+# 
+```
+![图](https://upload-images.jianshu.io/upload_images/8207483-00842e7cff045013.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+
+$$ C = \sum -Y\ln(pred)$$
+
+
 ### 深度神经网络
 ### 反向传播
 #### 梯度下降
