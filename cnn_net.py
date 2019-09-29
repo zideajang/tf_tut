@@ -1,6 +1,7 @@
 import tensorflow as tf
 from tensorflow import keras
 import pickle
+from keras.callbacks import TensorBoard
 
 X = pickle.load(open("X.pickle","rb"))
 y = pickle.load(open("y.pickle","rb"))
