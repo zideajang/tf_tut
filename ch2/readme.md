@@ -100,4 +100,26 @@ $$
   \right]
 $$
 
+- 卷积之后矩阵
+$$
+ \left[
+ \begin{matrix}
+   y_{00} & y_{01}    \\
+   y_{12} & y_{11}    
+  \end{matrix}
+  \right]
+$$
+
+- 卷积后的残差矩阵
+$$
+ \left[
+ \begin{matrix}
+   \delta^{l+1}_{00} & \delta^{l+1}_{01}    \\
+   \delta^{l+1}_{12} & \delta^{l+1}_{11}    
+  \end{matrix}
+  \right]
+$$
+
 - 卷积
+
+### AlexNet
