@@ -71,10 +71,14 @@ train_data = CifarData(train_filenames,True)
 batch_size = 20
 train_steps = 10000
 test_steps = 100
+
 with tf.name_scope('train_op'):
     # learning rate le-3 
     train_op = tf.train.AdamOptimizer(1e-3).minimize(loss)
 init = tf.global_variables_initializer()
+
+
+
 
 # visilization loss and accuracy
 loss_summary = tf.summary.scalar('loss',loss)
@@ -101,15 +105,34 @@ if not os.path.exists(train_log_dir):
     os.mkdir(train_log_dir)
 if not os.path.exists(test_log_dir):
     os.mkdir(test_log_dir)
-    
+
+output_summary_every_steps = 100    
 
 with tf.Session() as sess:
     sess.run(init)
-    train_writer = tf.summary.FileWriter(train_log_dir)
+    
+    train_writer = tf.summary.FileWriter(train_log_dir,sess.graph)
+    test_writer = tf.summary.FileWriter(test_log_dir)
+
+    fixed_test_batach_data,fixed_test_batch_labels = test_data.next_batch(batch_size)
+
     # test_writer = tf.sum
     for i in range(train_steps):
         batch_data,batch_labels = train_data.next_batch(batch_size)
-        loss_val, accu_val,_ = sess.run([loss,accuracy,train_op],feed_dict={x: batch_data,y: batch_labels})
+        eval_ops = [loss,accuracy,train_op]
+        should_output_summary = ((i+1) % output_summary_every_steps == 0 )
+        if should_output_summary:
+            eval_ops.append(merged_summary)
+        eval_ops_results = sess.run(eval_ops,feed_dict={x: batch_data,y: batch_labels})
+        # 
+        loss_val, accu_val = eval_ops_results[0:2]
+        
+        if should_output_summary:
+            train_summary_str = eval_ops_results[-1]
+            train_writer.add_summary(train_summary_str,i+1)
+            test_summary_str = sess.run([merged_summary_test],feed_dict={x:fixed_test_batach_data, y:fixed_test_batch_labels})[0]
+            test_writer.add_summary(test_summary_str,i+1)
+
         if (i+1) % 500 == 0:
             print '[Train] Step: %d, loss: %4.5f, acc: %4.5f' % (i, loss_val, accu_val)
         if (i+1) % 1000 == 0:
