@@ -12,7 +12,9 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 # print(os.listdir(CIFAR_DIR))
 
 # tensorboard
-
+# activation relu sigmoid tanh
+# weights initializer he xavier normla
+# optimzier Adam Momentum Gradient Descent
 train_filenames = [os.path.join(CIFAR_DIR, 'data_batch_%d' % i)
                    for i in range(1, 6)]
 test_filenames = [os.path.join(CIFAR_DIR, 'test_batch')]
@@ -27,24 +29,32 @@ x_image = tf.reshape(x,[-1,3,32,32])
 # 32 * 32
 x_image = tf.transpose(x_image,perm=[0,2,3,1])
 
-# neru feature_map image output
-conv1_1 = tf.layers.conv2d(x_image,32,(3,3),padding='same',activation=tf.nn.relu,name='conv1_1')
-conv1_2 = tf.layers.conv2d(conv1_1,32,(3,3),padding='same',activation=tf.nn.relu,name='conv1_2')
-# 16 * 16
-pooling1 = tf.layers.max_pooling2d(conv1_2,(2,2),(2,2),name='pool1')
+def convnet(inputs,activation,kernel_initializer):
+    # neru feature_map image output
+    # kernel_initializer = None tf.glorot_uniform_initializer
+    conv1_1 = tf.layers.conv2d(inputs,32,(3,3),padding='same',activation=activation,kernel_initializer=kernel_initializer, name='conv1_1')
+    conv1_2 = tf.layers.conv2d(conv1_1,32,(3,3),padding='same',activation=activation,kernel_initializer=kernel_initializer,name='conv1_2')
+    # 16 * 16
+    pooling1 = tf.layers.max_pooling2d(conv1_2,(2,2),(2,2),name='pool1')
 
-conv2_1 = tf.layers.conv2d(pooling1,32,(3,3),padding='same',activation=tf.nn.relu,name='conv2_1')
-conv2_2 = tf.layers.conv2d(conv2_1,32,(3,3),padding='same',activation=tf.nn.relu,name='conv2_2')
-# 8 * 8
-pooling2 = tf.layers.max_pooling2d(conv2_2,(2,2),(2,2),name='pool2')
+    conv2_1 = tf.layers.conv2d(pooling1,32,(3,3),padding='same',activation=activation,kernel_initializer=kernel_initializer,name='conv2_1')
+    conv2_2 = tf.layers.conv2d(conv2_1,32,(3,3),padding='same',activation=activation,kernel_initializer=kernel_initializer,name='conv2_2')
+    # 8 * 8
+    pooling2 = tf.layers.max_pooling2d(conv2_2,(2,2),(2,2),name='pool2')
 
-conv3_1 = tf.layers.conv2d(pooling2,32,(3,3),padding='same',activation=tf.nn.relu,name='conv3_1')
-conv3_2 = tf.layers.conv2d(conv3_1,32,(3,3),padding='same',activation=tf.nn.relu,name='conv3_2')
-# 4 * 4
-pooling3 = tf.layers.max_pooling2d(conv3_2,(2,2),(2,2),name='pool3')
+    conv3_1 = tf.layers.conv2d(pooling2,32,(3,3),padding='same',activation=activation,kernel_initializer=kernel_initializer,name='conv3_1')
+    conv3_2 = tf.layers.conv2d(conv3_1,32,(3,3),padding='same',activation=activation,kernel_initializer=kernel_initializer,name='conv3_2')
+    # 4 * 4
+    pooling3 = tf.layers.max_pooling2d(conv3_2,(2,2),(2,2),name='pool3')
 
 # [None , 4 * 4 * 32]
-flatten = tf.layers.flatten(pooling3)
+    flatten = tf.layers.flatten(pooling3)
+    return flatten
+
+# flatten = convnet(x_image,tf.nn.relu)
+# tf.truncated_normal_initializer(stddev=0.02)
+# tf.keras.initializers.he_normal
+flatten = convnet(x_image,tf.nn.relu,None)
 y_ = tf.layers.dense(flatten,10)
 """
 hidden1 = tf.layers.dense(x,100,activation=tf.nn.relu)
@@ -74,7 +84,9 @@ test_steps = 100
 
 with tf.name_scope('train_op'):
     # learning rate le-3 
-    train_op = tf.train.AdamOptimizer(1e-3).minimize(loss)
+    # train_op = tf.train.AdamOptimizer(1e-3).minimize(loss)
+    train_op = tf.train.GradientDescentOptimizer(1e-4).minimize(loss)
+    # train_op = tf.train.MomentumOptimizer(learning_rate=1e-4,momentum=0.9).minimize(loss)
 init = tf.global_variables_initializer()
 
 

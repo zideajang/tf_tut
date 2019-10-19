@@ -123,3 +123,6 @@ $$
 - 卷积
 
 ### AlexNet
+**AlexNet**
+### ResNet
+是由微软 kaiming He 等 4 名华人提出

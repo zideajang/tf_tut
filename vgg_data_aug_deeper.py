@@ -4,7 +4,7 @@ import numpy as np
 import cPickle
 import os
 import utils
-from utils import CifarData
+from utils_aug import CifarData
 # save file format as numpy
 # file format as cPickle
 CIFAR_DIR = "./cifar-10-batches"
@@ -19,29 +19,52 @@ test_filenames = [os.path.join(CIFAR_DIR, 'test_batch')]
 train_data = CifarData(train_filenames, True)
 test_data = CifarData(test_filenames, False)
 
+batch_size = 20
+
 # None present confirm count of smaples
-x = tf.placeholder(tf.float32,[None,3072])
-y = tf.placeholder(tf.int64,[None])
+x = tf.placeholder(tf.float32,[batch_size,3072])
+y = tf.placeholder(tf.int64,[batch_size])
 
 x_image = tf.reshape(x,[-1,3,32,32])
 # 32 * 32
 x_image = tf.transpose(x_image,perm=[0,2,3,1])
 
+x_image_arr = tf.split(x_image,num_or_size_splits=batch_size,axis=0)
+result_x_image_arr = []
+for x_single_image in x_image_arr:
+    # single image [1,32,32,3]
+    x_single_image = tf.reshape(x_single_image,[32,32,3])
+    data_aug_1 = tf.image.random_flip_left_right(x_single_image)
+    data_aug_2 = tf.image.random_brightness(data_aug_1,max_delta=63)
+    data_aug_3 = tf.image.random_contrast(data_aug_2,lower=0.2,upper=1.8)
+    x_single_image = tf.reshape(data_aug_3,[1,32,32,3])
+    result_x_image_arr.append(x_single_image)
+
+result_x_images = tf.concat(result_x_image_arr,axis=0)
+normal_result_x_images = result_x_images / 127.5 - 1
+
+# image argument
+
+
+
 # neru feature_map image output
-conv1_1 = tf.layers.conv2d(x_image,32,(3,3),padding='same',activation=tf.nn.relu,name='conv1_1')
+conv1_1 = tf.layers.conv2d(normal_result_x_images,32,(3,3),padding='same',activation=tf.nn.relu,name='conv1_1')
 conv1_2 = tf.layers.conv2d(conv1_1,32,(3,3),padding='same',activation=tf.nn.relu,name='conv1_2')
+conv1_3 = tf.layers.conv2d(conv1_2,32,(3,3),padding='same',activation=tf.nn.relu,name='conv1_3')
 # 16 * 16
-pooling1 = tf.layers.max_pooling2d(conv1_2,(2,2),(2,2),name='pool1')
+pooling1 = tf.layers.max_pooling2d(conv1_3,(2,2),(2,2),name='pool1')
 
 conv2_1 = tf.layers.conv2d(pooling1,32,(3,3),padding='same',activation=tf.nn.relu,name='conv2_1')
 conv2_2 = tf.layers.conv2d(conv2_1,32,(3,3),padding='same',activation=tf.nn.relu,name='conv2_2')
+conv2_3 = tf.layers.conv2d(conv2_2,32,(3,3),padding='same',activation=tf.nn.relu,name='conv2_3')
 # 8 * 8
-pooling2 = tf.layers.max_pooling2d(conv2_2,(2,2),(2,2),name='pool2')
+pooling2 = tf.layers.max_pooling2d(conv2_3,(2,2),(2,2),name='pool2')
 
 conv3_1 = tf.layers.conv2d(pooling2,32,(3,3),padding='same',activation=tf.nn.relu,name='conv3_1')
 conv3_2 = tf.layers.conv2d(conv3_1,32,(3,3),padding='same',activation=tf.nn.relu,name='conv3_2')
+conv3_3 = tf.layers.conv2d(conv3_2,32,(3,3),padding='same',activation=tf.nn.relu,name='conv3_3')
 # 4 * 4
-pooling3 = tf.layers.max_pooling2d(conv3_2,(2,2),(2,2),name='pool3')
+pooling3 = tf.layers.max_pooling2d(conv3_3,(2,2),(2,2),name='pool3')
 
 # [None , 4 * 4 * 32]
 flatten = tf.layers.flatten(pooling3)
@@ -68,7 +91,7 @@ accuracy = tf.reduce_mean(tf.cast(correct_prediction,tf.float64))
 
 train_data = CifarData(train_filenames,True)
 # test_data = CifarData(test_filenames,False)
-batch_size = 20
+# batch_size = 20
 train_steps = 10000
 test_steps = 100
 
@@ -102,8 +125,8 @@ loss_summary = tf.summary.scalar('loss',loss)
 # 'loss' <10,1.1> <20 1.08
 accuracy_summary = tf.summary.scalar('accuracy',accuracy)
 # inverse regerization 
-source_image = (x_image + 1) * 127.5
-inputs_summary = tf.summary.image('inputs_image',source_image)
+# source_image = (x_image + 1) * 127.5
+inputs_summary = tf.summary.image('inputs_image',result_x_images)
 
 # call summary to merget
 merged_summary = tf.summary.merge_all()

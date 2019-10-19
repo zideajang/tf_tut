@@ -13,6 +13,12 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
 # tensorboard
 
+# fine-tune
+# 1. save models (third_party) 
+# 2. restore models 
+# 3. keep some layers fixed
+# 
+
 train_filenames = [os.path.join(CIFAR_DIR, 'data_batch_%d' % i)
                    for i in range(1, 6)]
 test_filenames = [os.path.join(CIFAR_DIR, 'test_batch')]
@@ -28,13 +34,13 @@ x_image = tf.reshape(x,[-1,3,32,32])
 x_image = tf.transpose(x_image,perm=[0,2,3,1])
 
 # neru feature_map image output
-conv1_1 = tf.layers.conv2d(x_image,32,(3,3),padding='same',activation=tf.nn.relu,name='conv1_1')
-conv1_2 = tf.layers.conv2d(conv1_1,32,(3,3),padding='same',activation=tf.nn.relu,name='conv1_2')
+conv1_1 = tf.layers.conv2d(x_image,32,(3,3),padding='same',activation=tf.nn.relu,trainable=False, name='conv1_1')
+conv1_2 = tf.layers.conv2d(conv1_1,32,(3,3),padding='same',activation=tf.nn.relu,trainable=False,name='conv1_2')
 # 16 * 16
 pooling1 = tf.layers.max_pooling2d(conv1_2,(2,2),(2,2),name='pool1')
 
-conv2_1 = tf.layers.conv2d(pooling1,32,(3,3),padding='same',activation=tf.nn.relu,name='conv2_1')
-conv2_2 = tf.layers.conv2d(conv2_1,32,(3,3),padding='same',activation=tf.nn.relu,name='conv2_2')
+conv2_1 = tf.layers.conv2d(pooling1,32,(3,3),padding='same',activation=tf.nn.relu,trainable=False,name='conv2_1')
+conv2_2 = tf.layers.conv2d(conv2_1,32,(3,3),padding='same',activation=tf.nn.relu,trainable=False,name='conv2_2')
 # 8 * 8
 pooling2 = tf.layers.max_pooling2d(conv2_2,(2,2),(2,2),name='pool2')
 
@@ -123,7 +129,15 @@ if not os.path.exists(train_log_dir):
 if not os.path.exists(test_log_dir):
     os.mkdir(test_log_dir)
 
-output_summary_every_steps = 100    
+model_dir = os.path.join(run_dir,'model')
+if not os.path.exists(model_dir):
+    os.mkdir(model_dir)
+saver = tf.train.Saver()
+model_name = 'ckp-04000'
+model_path = os.path.join(model_dir,model_name)
+
+output_summary_every_steps = 100
+output_model_every_steps =  100    
 
 with tf.Session() as sess:
     sess.run(init)
@@ -132,6 +146,13 @@ with tf.Session() as sess:
     test_writer = tf.summary.FileWriter(test_log_dir)
 
     fixed_test_batach_data,fixed_test_batch_labels = test_data.next_batch(batch_size)
+
+    if os.path.exists(model_path + '.index'):
+        saver.restore(sess,model_path)
+        print 'model restored from %s ' % model_path
+        # model restored from ./run_vgg_tensorboard/model/ckp-04000
+    else:
+        print 'model %s does not exist' % model_path
 
     # test_writer = tf.sum
     for i in range(train_steps):
@@ -162,3 +183,6 @@ with tf.Session() as sess:
                 all_test_acc_val.append(test_acc_val)
             test_acc = np.mean(all_test_acc_val)
             print '[Test ] Step: %d, acc: %4.5f ' % (i+1,test_acc)
+        if (i+1) % output_model_every_steps == 0:
+            saver.save(sess,os.path.join(model_dir,'ckp-%05d' %(i+1)))
+            print 'model saved to ckp-%05d' % (i+1)
